@@ -1,0 +1,25 @@
+#title {
+    font-size: 40px;
+    color: rgb(254, 254, 93);
+    font-weight: bolder;
+}
+
+#game {
+    border: none;
+    box-shadow: 0 0 20px aliceblue;
+    border-radius: 10px;
+    margin: 20px, auto;
+    max-width: 1000px;
+    width: 90%;
+    height: auto;
+}
+
+#status {
+    color: white;
+    font-size: 24px;
+}
+
+* {
+    text-align: center;
+    background-color: rgb(18, 12, 12);
+}
