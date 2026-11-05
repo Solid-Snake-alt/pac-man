@@ -1,10 +1,10 @@
-
 const TILE_SIZE = 32;
 const COLS = 40;
 const ROWS = 17;
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+const status = document.getElementById("status");
 
 canvas.width = COLS * TILE_SIZE;
 canvas.height = ROWS * TILE_SIZE;
@@ -101,10 +101,10 @@ function draw() {
     ctx.fill()
 }
 
-let previousTime = 0;
+let previousTime = 0; //previous frame, used for calculating the time difference b/w two frames.
 
-function gameLoop(timestamp) {
-    const dt = Math.min((timestamp - previousTime) / 1000 || 0, 0.05);
+function gameLoop(timestamp) { //timestamp is a predefined parameter given by the requestAnimationFrame() function which tells you how much time has elapsed since the browser refreshed.
+    const dt = Math.min((timestamp - previousTime) / 1000 || 0, 0.05); 
     previousTime = timestamp;
     
     draw();
