@@ -32,10 +32,14 @@ const originalMap = [
 let map;
 let won;
 let player;
+let score;
+
+const pressed = new Set();
 
 function resetGame() {
     map = originalMap.map(row => row.split(""));
     won = false;
+    score = 0;
 
     player = {
         x: 1.5 * TILE_SIZE,
@@ -44,7 +48,7 @@ function resetGame() {
         size: 20
     };
 
-    statusT.textContent = "Score: 0"
+    statusT.textContent = "Score: 0";
 }
 
 window.addEventListener("keydown", event => {
@@ -65,12 +69,12 @@ window.addEventListener("keyup", event => {
 }); 
 
 function canMoveTo(x,y) { 
-    const half = player.x / 2;
+    const half = player.size / 2;
     const corners = [
-        [x - half, y- half] //top left
-        [x + half, y -half] //top right
-        [x - half, y + half] //bottom left
-        [x + half, y + half] //bottom right
+        [x - half, y- half], //top left
+        [x + half, y -half], //top right
+        [x - half, y + half], //bottom left
+        [x + half, y + half], //bottom right
     ];
 
     return corners.every(([cx, cy]) => {
@@ -82,11 +86,24 @@ function tileAt(x, y) {
     const cols = Math.floor(x/TILE_SIZE);
     const rows = Math.floor(y/TILE_SIZE);
 
-    
+    if (rows<0 || rows>=ROWS || cols<0 || cols>=COLS) {
+        return "#";
+    }
+
+    return map[rows][cols];
 }
 
 function checkTile() {
-    
+  const col = Math.floor(player.x / TILE_SIZE);
+  const row = Math.floor(player.y / TILE_SIZE);
+  const tile = map[row][col];
+
+  if (tile === ".") {
+    map[row][col] = " ";
+    score++;
+    statusT.textContent =
+    `Score: ${score}`;
+  }
 }
 
 function update(dt) {
@@ -101,13 +118,13 @@ function update(dt) {
     if(pressed.has("arrowdown") || pressed.has("s")) dy++;
 
     const nextx = player.x + (dx * player.speed *dt);
-    const nexty = player.y + (dx * player.speed * dt);
+    const nexty = player.y + (dy * player.speed * dt);
 
     if (canMoveTo(nextx, player.y)) {
         player.x = nextx;
     }
 
-    if(canMoveTo(nexty, player.x)) {
+    if(canMoveTo(player.x, nexty)) {
         player.y = nexty;
     }
 
@@ -121,34 +138,32 @@ function draw() {
         for (let cols = 0; cols < COLS; cols++) {
 
             const tile = map[rows][cols];
-            const x = cols * TILE_SIZE;
-            const y = rows * TILE_SIZE;
+            const tileX = cols * TILE_SIZE;
+            const tileY = rows * TILE_SIZE;
 
             if (tile === "#") {
                 ctx.fillStyle = "#052ea9";
-                ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
 
                 ctx.fillStyle = "#000000";
                 ctx.fillRect(
-                    x + 3, y + 3,
+                    tileX + 3, tileY + 3,
                     TILE_SIZE - 6, TILE_SIZE - 6
                 );
             } 
             if (tile == ".") {
                 ctx.fillStyle = "#c3c016"
                 ctx.font = "bold 22px sans-serif";
-                ctx.fillText(".", x+TILE_SIZE/2, y+TILE_SIZE/2);
+                ctx.fillText(".", tileX+TILE_SIZE/2, tileY+TILE_SIZE/2);
             }
         }
     }
     //drawing pac-man
-    const radius = 15;
-    const x = 20 + TILE_SIZE;
-    const y = 20 + TILE_SIZE;
+    const radius = player.size/2;
     ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.arc(x, y, radius, 0.2 * Math.PI, 1.8 * Math.PI);
-    ctx.lineTo(x, y);
+    ctx.moveTo(player.x, player.y);
+    ctx.arc(player.x, player.y, radius, 0.2 * Math.PI, 1.8 * Math.PI);
+    ctx.lineTo(player.x, player.y);
     ctx.fillStyle = "#f3ff10";
     ctx.fill()
 }
