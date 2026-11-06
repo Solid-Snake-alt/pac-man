@@ -4,7 +4,7 @@ const ROWS = 17;
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-const status = document.getElementById("status");
+const statusT = document.getElementById("status");
 
 canvas.width = COLS * TILE_SIZE;
 canvas.height = ROWS * TILE_SIZE;
@@ -43,6 +43,8 @@ function resetGame() {
         speed: 175,
         size: 20
     };
+
+    statusT.textContent = "Score: 0"
 }
 
 window.addEventListener("keydown", event => {
@@ -61,6 +63,56 @@ window.addEventListener("keydown", event => {
 window.addEventListener("keyup", event => {
     pressed.delete(event.key.toLowerCase());
 }); 
+
+function canMoveTo(x,y) { 
+    const half = player.x / 2;
+    const corners = [
+        [x - half, y- half] //top left
+        [x + half, y -half] //top right
+        [x - half, y + half] //bottom left
+        [x + half, y + half] //bottom right
+    ];
+
+    return corners.every(([cx, cy]) => {
+        return tileAt(cx, cy) !== "#";
+    });
+}
+
+function tileAt(x, y) {
+    const cols = Math.floor(x/TILE_SIZE);
+    const rows = Math.floor(y/TILE_SIZE);
+
+    
+}
+
+function checkTile() {
+    
+}
+
+function update(dt) {
+    if (won) return;
+    
+    let dx = 0;
+    let dy = 0;
+
+    if(pressed.has("arrowleft") || pressed.has("a")) dx--;
+    if(pressed.has("arrowright") || pressed.has("d")) dx++;
+    if(pressed.has("arrowup") || pressed.has("w")) dy--;
+    if(pressed.has("arrowdown") || pressed.has("s")) dy++;
+
+    const nextx = player.x + (dx * player.speed *dt);
+    const nexty = player.y + (dx * player.speed * dt);
+
+    if (canMoveTo(nextx, player.y)) {
+        player.x = nextx;
+    }
+
+    if(canMoveTo(nexty, player.x)) {
+        player.y = nexty;
+    }
+
+    checkTile();
+}
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -89,7 +141,7 @@ function draw() {
             }
         }
     }
-
+    //drawing pac-man
     const radius = 15;
     const x = 20 + TILE_SIZE;
     const y = 20 + TILE_SIZE;
@@ -107,6 +159,7 @@ function gameLoop(timestamp) { //timestamp is a predefined parameter given by th
     const dt = Math.min((timestamp - previousTime) / 1000 || 0, 0.05); 
     previousTime = timestamp;
     
+    update(dt);
     draw();
     requestAnimationFrame(gameLoop);
 }
