@@ -6,3 +6,5 @@ My first Javascript project!
 Controls:
 WASD or Arrow Keys for movement.
 R to reset the game.
+
+https://solid-snake-alt.github.io/pac-man/
